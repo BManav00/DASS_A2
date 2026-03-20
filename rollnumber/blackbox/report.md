@@ -3,7 +3,7 @@
 - Base URL: `http://localhost:8000/api/v1`
 - Tooling: `pytest`, `requests`
 - Test command: `rollnumber/whitebox/.venv/bin/python -m pytest -q rollnumber/blackbox/tests`
-- Latest run summary: `59 passed, 12 failed`
+- Latest run summary: `59 passed, 15 failed`
 
 ## Test Cases
 
@@ -403,6 +403,24 @@
 - Expected output: `404 Not Found`
 - Why this test is needed: Confirms proper missing-ticket behavior.
 
+### Test Case: test_cart_total_includes_every_item_including_last
+- Endpoint tested: `POST /api/v1/cart/add`, `GET /api/v1/cart`
+- Input (method, URL, body): Add `{"product_id":1,"quantity":2}` and `{"product_id":2,"quantity":1}`, then fetch cart
+- Expected output: `cart.total` must equal sum of all item subtotals (including last item)
+- Why this test is needed: Verifies documented requirement that every cart item is counted in total.
+
+### Test Case: test_review_post_for_nonexistent_product_is_rejected
+- Endpoint tested: `POST /api/v1/products/{product_id}/reviews`
+- Input (method, URL, body): Post review to a random non-existent `product_id`
+- Expected output: Request should be rejected (`404` expected) because product does not exist
+- Why this test is needed: Prevents creation of orphan review records tied to invalid products.
+
+### Test Case: test_support_ticket_list_contains_saved_message_for_user_view
+- Endpoint tested: `POST /api/v1/support/ticket`, `GET /api/v1/support/tickets`
+- Input (method, URL, body): Create ticket with unique message, then retrieve user ticket list
+- Expected output: Listed ticket should include the same message content
+- Why this test is needed: Ensures users can see full ticket information they submitted.
+
 ## Bug Group 1
 
 ### Bug 1
@@ -443,15 +461,54 @@
 - Expected result: Updated address data should be returned and persisted
 - Actual result: `200 OK` but response contains old address values; follow-up `GET /addresses` shows values unchanged
 
+## Bug Group 3
+
+### Bug 7
+- Endpoint tested: `GET /api/v1/cart`
+- Request payload: Cart with multiple items (for example `product_id=1, quantity=2` and `product_id=2, quantity=1`)
+- Expected result: `cart.total` equals sum of all item subtotals
+- Actual result: `cart.total` omits the last item subtotal (example observed: expected `-142`, actual `-16`)
+
+### Bug 8
+- Endpoint tested: `POST /api/v1/products/{product_id}/reviews`
+- Request payload: Review submitted to non-existent product ID (random high ID)
+- Expected result: `404 Not Found` (product should exist before review creation)
+- Actual result: `200 OK` and review row is created
+
+### Bug 9
+- Endpoint tested: `GET /api/v1/support/tickets`
+- Request payload: Create ticket with message, then list tickets as same user
+- Expected result: Ticket object includes the stored `message` for user visibility
+- Actual result: Response omits `message` field; only ticket_id/subject/status are returned
+
+## Bug Group 4
+
+### Bug 10
+- Endpoint tested: `GET /api/v1/profile` (header validation path)
+- Request payload: Header `X-User-ID: 999999` with valid `X-Roll-Number`
+- Expected result: `400 Bad Request` per documented header validation contract
+- Actual result: `404 Not Found`
+
+### Bug 11
+- Endpoint tested: `GET /api/v1/products` vs `GET /api/v1/admin/products`
+- Request payload: Compare same `product_id` values across user/admin product listings
+- Expected result: User-facing `price` must exactly match database/admin `price`
+- Actual result: Price mismatch observed (example: user `100` vs admin `95` for same product)
+
+### Bug 12
+- Endpoint tested: `POST /api/v1/wallet/pay`
+- Request payload: Add `10`, then pay `5`, then compare wallet before/after
+- Expected result: Exactly `5` should be deducted
+- Actual result: Deduction differs (observed around `5.6`)
+
+### Bug 13
+- Endpoint tested: `POST /api/v1/orders/{order_id}/cancel`, `GET /api/v1/products/{product_id}`
+- Request payload: Create fresh order with quantity `1`, cancel it, check product stock
+- Expected result: Stock increases by exactly `1` after cancellation
+- Actual result: Stock remains unchanged after cancellation
+
 ## Execution Notes
 
 - Full test suite run command: `rollnumber/whitebox/.venv/bin/python -m pytest -q rollnumber/blackbox/tests`
-- Observed result: `59 passed, 12 failed`
-- The 6 grouped bugs above are documented as primary defects for submission grouping.
-
-## Additional Observed Failures (Outside Bug Groups 1–6)
-
-- `GET /profile` with non-existing `X-User-ID` returned `404` instead of expected `400` from header contract.
-- Product list price and admin DB price mismatch detected for at least one active product (`/products` vs `/admin/products`).
-- Wallet pay path deducted more than requested amount in exact-deduction assertion.
-- Cancelling a fresh placed order did not increase product stock by expected quantity.
+- Observed result (latest run): `59 passed, 15 failed`
+- Bugs are now grouped up to Bug 13.
