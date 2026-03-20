@@ -206,6 +206,29 @@ def test_buy_property_branches_and_exact_balance_case():
     assert prop.owner == player
 
 
+def test_buy_property_rejects_owned_and_mortgaged_cases():
+    # Covers buy_property guards for already-owned and mortgaged properties.
+    game = Game(["A", "B"])
+    buyer = game.players[0]
+    owner = game.players[1]
+    prop = _sample_property()
+
+    prop.owner = owner
+    owner.add_property(prop)
+    buyer_start = buyer.balance
+    owner_start = owner.balance
+    assert game.buy_property(buyer, prop) is False
+    assert prop.owner == owner
+    assert buyer.balance == buyer_start
+    assert owner.balance == owner_start
+
+    prop.owner = None
+    owner.remove_property(prop)
+    prop.is_mortgaged = True
+    assert game.buy_property(buyer, prop) is False
+    assert prop.owner is None
+
+
 def test_pay_rent_branches_and_transfer_to_owner():
     # Covers pay_rent branches and validates owner receives rent transfer.
     game = Game(["A", "B"])
