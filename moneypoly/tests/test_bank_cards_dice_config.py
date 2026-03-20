@@ -61,6 +61,20 @@ def test_bank_give_loan_and_loan_stats(capsys):
     assert "Loans issued" in out
 
 
+def test_bank_handles_large_transactions():
+    # Covers large-value branch behavior for collection and payout math.
+    bank = Bank()
+    big = 10**9
+    start = bank.get_balance()
+
+    bank.collect(big)
+    assert bank.get_balance() == start + big
+
+    paid = bank.pay_out(big)
+    assert paid == big
+    assert bank.get_balance() == start
+
+
 def test_carddeck_draw_peek_cycle_and_empty(monkeypatch):
     # Covers CardDeck draw/peek empty and non-empty paths, plus cycle behavior.
     empty = CardDeck([])

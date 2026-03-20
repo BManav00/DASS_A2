@@ -325,6 +325,26 @@ All tests were implemented in `moneypoly/tests/` and each test targets explicit 
 - How discovered: `test_player_move_go_jail_and_property_management` failed.
 - Fix applied: updated `Player.move` to award salary when old position + steps crosses board size.
 
+### Error 9
+- What was wrong: `buy_property` allowed purchases for already-owned properties.
+- How discovered: `test_buy_property_rejects_owned_and_mortgaged_cases` failed.
+- Fix applied: added ownership guard in `buy_property` to reject already-owned properties.
+
+### Error 10
+- What was wrong: Failed unmortgage attempts could unintentionally clear the mortgage flag.
+- How discovered: updated `test_unmortgage_property_branches` asserted mortgage status after insufficient funds.
+- Fix applied: changed `unmortgage_property` to validate affordability before state mutation.
+
+### Error 11
+- What was wrong: `trade` allowed zero-value trades and raised on negative cash values.
+- How discovered: `test_trade_rejects_non_positive_cash_amount` failed.
+- Fix applied: added explicit validation requiring trade cash amount to be greater than zero.
+
+### Error 12
+- What was wrong: Large movement steps only awarded one Go salary even after multiple board wraps.
+- How discovered: `test_player_move_large_steps_and_zero_steps` failed.
+- Fix applied: updated `Player.move` to compute number of wraps and award salary per pass.
+
 ## 5. Final Coverage Report
 Command used:
 
@@ -335,7 +355,7 @@ pytest --cov --cov-branch --cov-report=term-missing
 Final result:
 - Statement coverage: **100%**
 - Branch coverage: **100%**
-- Tests passed: **47/47**
+- Tests passed: **51/51**
 
 Coverage summary from final run:
 - `main.py`: 100%
@@ -350,6 +370,6 @@ Coverage summary from final run:
 - `moneypoly/ui.py`: 100%
 
 ## 6. Summary
-- Total white-box tests implemented: **47**
-- Logical errors fixed: **8**
+- Total white-box tests implemented: **51**
+- Logical errors fixed: **12**
 - Final status: all tests pass and strict **100% branch coverage achieved**.
