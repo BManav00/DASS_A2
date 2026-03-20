@@ -43,14 +43,23 @@ class Player:
         Returns the new board position.
         """
         old_position = self.position
-        self.position = (old_position + steps) % BOARD_SIZE
+        total_steps = old_position + steps
+        self.position = total_steps % BOARD_SIZE
 
-        if old_position + steps >= BOARD_SIZE:
-            self.add_money(GO_SALARY)
-            if self.position == 0:
+        if steps > 0:
+            passes = total_steps // BOARD_SIZE
+        else:
+            passes = 0
+
+        if passes > 0:
+            payout = passes * GO_SALARY
+            self.add_money(payout)
+            if passes == 1 and self.position == 0:
                 print(f"  {self.name} landed on Go and collected ${GO_SALARY}.")
-            else:
+            elif passes == 1:
                 print(f"  {self.name} passed Go and collected ${GO_SALARY}.")
+            else:
+                print(f"  {self.name} passed Go {passes} times and collected ${payout}.")
 
         return self.position
 

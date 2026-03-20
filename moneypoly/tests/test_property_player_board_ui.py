@@ -136,6 +136,21 @@ def test_player_move_go_jail_and_property_management(capsys):
     assert "Player(" in repr(player)
 
 
+def test_player_move_large_steps_and_zero_steps():
+    # Covers movement boundaries for very large and zero-step inputs.
+    player = Player("Looper", balance=500)
+
+    player.position = 5
+    player.move(80)
+    assert player.position == 5
+    assert player.balance == 500 + (2 * GO_SALARY)
+
+    before = player.balance
+    player.move(0)
+    assert player.position == 5
+    assert player.balance == before
+
+
 def test_player_status_line_jail_and_non_jail():
     # Covers status_line conditional tag branch.
     player = Player("Status", balance=500)
