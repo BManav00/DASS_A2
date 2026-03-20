@@ -20,6 +20,7 @@ def test_bank_collect_and_get_balance():
     start = bank.get_balance()
     bank.collect(125)
     assert bank.get_balance() == start + 125
+    assert "Bank(" in repr(bank)
 
 
 def test_bank_pay_out_non_positive_and_valid_and_insufficient():

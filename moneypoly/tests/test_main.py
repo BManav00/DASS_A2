@@ -1,5 +1,8 @@
 """White-box tests for main.py entry-point flow."""
 
+from pathlib import Path
+import runpy
+
 import main
 
 
@@ -67,3 +70,23 @@ def test_main_handles_value_error(monkeypatch, capsys):
     main.main()
 
     assert "Setup error: bad setup" in capsys.readouterr().out
+
+
+def test_main_module_entrypoint_branch_executes(monkeypatch):
+    # Covers the `if __name__ == "__main__"` branch by running the file as a script.
+    called = {"run": 0}
+
+    class _EntrypointGame:
+        def __init__(self, _names):
+            pass
+
+        def run(self):
+            called["run"] += 1
+
+    monkeypatch.setattr("moneypoly.game.Game", _EntrypointGame)
+    monkeypatch.setattr("builtins.input", lambda _prompt: "A,B")
+
+    script = Path(__file__).resolve().parents[1] / "main.py"
+    runpy.run_path(str(script), run_name="__main__")
+
+    assert called["run"] == 1

@@ -39,12 +39,15 @@ def test_property_group_branches_and_owner_counts():
     group = PropertyGroup("Blue", "blue")
     p1 = Property("P1", 10, (120, 8), group)
     p2 = Property("P2", 12, (120, 8), group)
+    p3 = Property("P3", 14, (120, 8), None)
     alice = Player("Alice")
     bob = Player("Bob")
 
     assert group.size() == 2
     group.add_property(p1)
-    assert group.size() == 2
+    group.add_property(p3)
+    assert group.size() == 3
+    assert p3.group == group
 
     assert group.all_owned_by(None) is False
 
@@ -53,8 +56,13 @@ def test_property_group_branches_and_owner_counts():
     assert group.all_owned_by(alice) is False
 
     p2.owner = alice
+    p3.owner = alice
     assert group.all_owned_by(alice) is True
 
+    standalone = Property("Standalone", 30, (200, 20), None)
+    assert standalone.group is None
+
+    p3.owner = None
     counts = group.get_owner_counts()
     assert counts[alice] == 2
     assert "PropertyGroup(" in repr(group)
@@ -92,6 +100,11 @@ def test_player_money_and_bankruptcy_branches():
 def test_player_move_go_jail_and_property_management(capsys):
     # Covers move paths (land/pass go), jail transition, and property list branches.
     player = Player("Mover", balance=100)
+
+    player.position = 1
+    player.move(2)
+    assert player.position == 3
+    assert player.balance == 100
 
     player.position = 39
     player.move(2)

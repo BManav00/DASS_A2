@@ -419,6 +419,10 @@ def test_apply_card_known_actions(monkeypatch):
     monkeypatch.setattr(game.board, "get_tile_type", lambda _v: "blank")
     game._handle_move_to_card(player, 5)
 
+    monkeypatch.setattr(game.board, "get_tile_type", lambda _v: "property")
+    monkeypatch.setattr(game.board, "get_property_at", lambda _v: None)
+    game._handle_move_to_card(player, 8)
+
 
 def test_collect_from_all_action_branches():
     # Covers collect_from_all loop condition branches for self/insufficient/sufficient players.
@@ -494,7 +498,7 @@ def test_interactive_menu_branches(monkeypatch):
     game = Game(["A", "B"])
     player = game.current_player()
 
-    choices = iter([1, 2, 3, 4, 5, 6, 50, 6, 0, 0])
+    choices = iter([1, 2, 3, 4, 5, 6, 50, 6, 0, 9, 0])
 
     def fake_safe_int(_prompt, default=0):
         return next(choices)
