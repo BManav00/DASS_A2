@@ -86,7 +86,7 @@ def test_main_module_entrypoint_branch_executes(monkeypatch):
     monkeypatch.setattr("moneypoly.game.Game", _EntrypointGame)
     monkeypatch.setattr("builtins.input", lambda _prompt: "A,B")
 
-    script = Path(__file__).resolve().parents[1] / "main.py"
+    script = Path(__file__).resolve().parents[1] / "code" / "moneypoly" / "main.py"
     runpy.run_path(str(script), run_name="__main__")
 
     assert called["run"] == 1
