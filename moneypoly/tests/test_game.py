@@ -318,6 +318,18 @@ def test_trade_branches_and_cash_transfer_to_seller():
     assert seller.balance == seller_start + 50
 
 
+def test_trade_rejects_non_positive_cash_amount():
+    # Covers trade edge branch for non-positive offered cash.
+    game = Game(["A", "B"])
+    seller = game.players[0]
+    buyer = game.players[1]
+    prop = _sample_property()
+    prop.owner = seller
+
+    assert game.trade(seller, buyer, prop, 0) is False
+    assert game.trade(seller, buyer, prop, -10) is False
+
+
 def test_auction_property_with_winner(monkeypatch):
     # Covers auction bid branches (pass/low/too-high/valid) and winner assignment path.
     game = Game(["A", "B", "C", "D"])
