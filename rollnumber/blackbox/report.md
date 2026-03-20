@@ -442,3 +442,16 @@
 - Request payload: `{"street":"99999 Updated Street ...","is_default":true}`
 - Expected result: Updated address data should be returned and persisted
 - Actual result: `200 OK` but response contains old address values; follow-up `GET /addresses` shows values unchanged
+
+## Execution Notes
+
+- Full test suite run command: `rollnumber/whitebox/.venv/bin/python -m pytest -q rollnumber/blackbox/tests`
+- Observed result: `59 passed, 12 failed`
+- The 6 grouped bugs above are documented as primary defects for submission grouping.
+
+## Additional Observed Failures (Outside Bug Groups 1–6)
+
+- `GET /profile` with non-existing `X-User-ID` returned `404` instead of expected `400` from header contract.
+- Product list price and admin DB price mismatch detected for at least one active product (`/products` vs `/admin/products`).
+- Wallet pay path deducted more than requested amount in exact-deduction assertion.
+- Cancelling a fresh placed order did not increase product stock by expected quantity.
