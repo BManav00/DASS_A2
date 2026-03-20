@@ -290,6 +290,7 @@ def test_unmortgage_property_branches():
     prop.is_mortgaged = True
     owner.balance = 1
     assert game.unmortgage_property(owner, prop) is False
+    assert prop.is_mortgaged is True
 
     prop.is_mortgaged = True
     owner.balance = 1_000
