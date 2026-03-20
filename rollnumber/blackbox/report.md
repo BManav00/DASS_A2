@@ -3,7 +3,7 @@
 - Base URL: `http://localhost:8000/api/v1`
 - Tooling: `pytest`, `requests`
 - Test command: `rollnumber/whitebox/.venv/bin/python -m pytest -q rollnumber/blackbox/tests`
-- Latest run summary: `59 passed, 15 failed`
+- Latest run summary: `63 passed, 18 failed`
 
 ## Test Cases
 
@@ -421,6 +421,48 @@
 - Expected output: Listed ticket should include the same message content
 - Why this test is needed: Ensures users can see full ticket information they submitted.
 
+### Test Case: test_cart_add_requires_quantity_field
+- Endpoint tested: `POST /api/v1/cart/add`
+- Input (method, URL, body): `{"product_id":1}` (missing `quantity`)
+- Expected output: `400 Bad Request`
+- Why this test is needed: Enforces required-field validation for cart add requests.
+
+### Test Case: test_cart_update_requires_product_id_field
+- Endpoint tested: `POST /api/v1/cart/update`
+- Input (method, URL, body): `{"quantity":2}` (missing `product_id`)
+- Expected output: `400 Bad Request`
+- Why this test is needed: Ensures update requests identify a concrete cart item.
+
+### Test Case: test_get_reviews_for_nonexistent_product_returns_404
+- Endpoint tested: `GET /api/v1/products/{product_id}/reviews`
+- Input (method, URL, body): `GET /products/987654321/reviews`
+- Expected output: `404 Not Found`
+- Why this test is needed: Prevents phantom product review access for invalid products.
+
+### Test Case: test_coupon_percent_discount_respects_max_cap
+- Endpoint tested: `POST /api/v1/coupon/apply`
+- Input (method, URL, body): Large cart + `{"coupon_code":"PERCENT30"}`
+- Expected output: Discount should not exceed coupon `max_discount` cap
+- Why this test is needed: Verifies discount-cap enforcement for percentage coupons.
+
+### Test Case: test_coupon_fixed_discount_applies_exact_value
+- Endpoint tested: `POST /api/v1/coupon/apply`
+- Input (method, URL, body): Eligible cart + `{"coupon_code":"SAVE50"}`
+- Expected output: Returned discount equals fixed value (`50`)
+- Why this test is needed: Validates fixed-discount correctness.
+
+### Test Case: test_address_default_uniqueness_after_adding_new_default
+- Endpoint tested: `POST /api/v1/addresses`, `GET /api/v1/addresses`
+- Input (method, URL, body): Add one default address, then add another default address
+- Expected output: Exactly one address remains default (the latest default)
+- Why this test is needed: Enforces one-default-address invariant.
+
+### Test Case: test_review_average_uses_exact_decimal_math
+- Endpoint tested: `POST /api/v1/products/{product_id}/reviews`, `GET /api/v1/products/{product_id}/reviews`
+- Input (method, URL, body): Read current ratings, add two known ratings, recompute expected average
+- Expected output: API average matches exact decimal arithmetic
+- Why this test is needed: Checks non-truncated/non-rounded-down average calculations.
+
 ## Bug Group 1
 
 ### Bug 1
@@ -507,8 +549,28 @@
 - Expected result: Stock increases by exactly `1` after cancellation
 - Actual result: Stock remains unchanged after cancellation
 
+## Bug Group 5
+
+### Bug 14
+- Endpoint tested: `POST /api/v1/cart/add`
+- Request payload: `{"product_id":1}` (missing `quantity`)
+- Expected result: `400 Bad Request` because `quantity` is required and must be at least 1
+- Actual result: `200 OK` with item-added response
+
+### Bug 15
+- Endpoint tested: `POST /api/v1/cart/update`
+- Request payload: `{"quantity":2}` (missing `product_id`)
+- Expected result: `400 Bad Request` because update target item is unspecified
+- Actual result: `200 OK` with `Cart updated successfully`
+
+### Bug 16
+- Endpoint tested: `GET /api/v1/products/{product_id}/reviews`
+- Request payload: `GET /products/987654321/reviews` (non-existent product)
+- Expected result: `404 Not Found`
+- Actual result: `200 OK` with empty review payload
+
 ## Execution Notes
 
 - Full test suite run command: `rollnumber/whitebox/.venv/bin/python -m pytest -q rollnumber/blackbox/tests`
-- Observed result (latest run): `59 passed, 15 failed`
-- Bugs are now grouped up to Bug 13.
+- Observed result (latest run): `63 passed, 18 failed`
+- Bugs are now grouped up to Bug 16.
