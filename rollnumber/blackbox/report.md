@@ -463,6 +463,18 @@
 - Expected output: API average matches exact decimal arithmetic
 - Why this test is needed: Checks non-truncated/non-rounded-down average calculations.
 
+### Test Case: test_non_existing_user_id_is_rejected_for_user_scoped_get_endpoints
+- Endpoint tested: `GET /api/v1/cart`, `GET /api/v1/wallet`, `GET /api/v1/orders`, `GET /api/v1/loyalty`, `GET /api/v1/support/tickets`, `GET /api/v1/addresses`, `GET /api/v1/products`, `GET /api/v1/products/{product_id}`, `GET /api/v1/products/{product_id}/reviews`
+- Input (method, URL, body): Use valid roll header with non-existing `X-User-ID: 999999`
+- Expected output: `400 Bad Request` for all user-scoped endpoints
+- Why this test is needed: Enforces documented contract that `X-User-ID` must map to an existing user.
+
+### Test Case: test_cart_update_product_not_in_cart_returns_404
+- Endpoint tested: `POST /api/v1/cart/update`
+- Input (method, URL, body): `{"product_id":1,"quantity":2}` when cart is empty
+- Expected output: `404 Not Found`
+- Why this test is needed: Update should target an existing cart item; missing items must not succeed silently.
+
 ## Bug Group 1
 
 ### Bug 1
@@ -569,8 +581,41 @@
 - Expected result: `404 Not Found`
 - Actual result: `200 OK` with empty review payload
 
+## Bug Group 6
+
+### Bug 17
+- Endpoint tested: `POST /api/v1/cart/update`
+- Request payload: `{"product_id":1,"quantity":2}` with empty cart / product absent in cart
+- Expected result: `404 Not Found`
+- Actual result: `200 OK` with `Cart updated successfully`
+
+### Bug 18
+- Endpoint tested: `GET /api/v1/cart`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999` (non-existent user)
+- Expected result: `400 Bad Request` because user must exist
+- Actual result: `200 OK` with cart payload (example: `{"cart_id":202,"items":[],"total":0}`)
+
+### Bug 19
+- Endpoint tested: `GET /api/v1/wallet`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
+- Expected result: `400 Bad Request`
+- Actual result: `200 OK` with wallet payload (`{"wallet_balance":0}`)
+
+### Bug 20
+- Endpoint tested: `GET /api/v1/orders`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
+- Expected result: `400 Bad Request`
+- Actual result: `200 OK` with empty orders list (`[]`)
+
+### Bug 21
+- Endpoint tested: `GET /api/v1/support/tickets`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
+- Expected result: `400 Bad Request`
+- Actual result: `200 OK` with empty ticket list (`[]`)
+
 ## Execution Notes
 
 - Full test suite run command: `rollnumber/whitebox/.venv/bin/python -m pytest -q rollnumber/blackbox/tests`
 - Observed result (latest run): `63 passed, 18 failed`
-- Bugs are now grouped up to Bug 16.
+- Bugs are now grouped up to Bug 21.
+- Round-4 tests were added after this run; while validating further, the local API became unreachable on `localhost:8000` (connection refused), so full-suite re-run for round-4 was blocked.
