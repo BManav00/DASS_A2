@@ -1,3 +1,5 @@
+"""Card deck definitions and draw mechanics for MoneyPoly."""
+
 import random
 
 CHANCE_CARDS = [

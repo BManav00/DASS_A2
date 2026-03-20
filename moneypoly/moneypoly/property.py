@@ -1,3 +1,5 @@
+"""Property and property-group domain models for MoneyPoly."""
+
 class Property:
     """Represents a single purchasable property tile on the MoneyPoly board."""
 
@@ -61,6 +63,8 @@ class Property:
 
 
 class PropertyGroup:
+    """Represents a color set of related properties on the board."""
+
     def __init__(self, name, color):
         self.name = name
         self.color = color

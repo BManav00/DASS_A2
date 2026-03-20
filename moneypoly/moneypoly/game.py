@@ -1,3 +1,5 @@
+"""Core game-loop orchestration and turn resolution for MoneyPoly."""
+
 from moneypoly.config import (
     JAIL_FINE,
     AUCTION_MIN_INCREMENT,

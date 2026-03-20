@@ -1,3 +1,5 @@
+"""Dice rolling utilities for turn movement in MoneyPoly."""
+
 import random
 
 class Dice:

@@ -1,7 +1,11 @@
+"""Bank accounting and loan logic for MoneyPoly."""
+
 from moneypoly.config import BANK_STARTING_FUNDS
 
 
 class Bank:
+    """Tracks central bank funds and monetary transactions."""
+
     def __init__(self):
         self._funds = BANK_STARTING_FUNDS
         self._loans_issued = []

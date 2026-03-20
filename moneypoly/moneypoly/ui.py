@@ -1,3 +1,5 @@
+"""Terminal UI helpers for presenting MoneyPoly game information."""
+
 def print_banner(title):
     """Print a decorated section header."""
     width = 52
