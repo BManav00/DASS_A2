@@ -422,3 +422,23 @@
 - Request payload: `{"coupon_code":"DEAL5"}` (expired in docs timeline)
 - Expected result: `400 Bad Request` (expired coupon should be rejected)
 - Actual result: `200 OK` with discount applied
+
+## Bug Group 2
+
+### Bug 4
+- Endpoint tested: `POST /api/v1/checkout`
+- Request payload: Empty cart + `{"payment_method":"COD"}`
+- Expected result: `400 Bad Request` because checkout must reject empty carts
+- Actual result: `200 OK` and order created with `total_amount=0`
+
+### Bug 5
+- Endpoint tested: `POST /api/v1/products/{product_id}/reviews`
+- Request payload: `{"rating":0,"comment":"below range"}` and `{"rating":6,"comment":"above range"}`
+- Expected result: `400 Bad Request` for ratings outside 1..5
+- Actual result: `200 OK` and review records created
+
+### Bug 6
+- Endpoint tested: `PUT /api/v1/addresses/{address_id}`
+- Request payload: `{"street":"99999 Updated Street ...","is_default":true}`
+- Expected result: Updated address data should be returned and persisted
+- Actual result: `200 OK` but response contains old address values; follow-up `GET /addresses` shows values unchanged
