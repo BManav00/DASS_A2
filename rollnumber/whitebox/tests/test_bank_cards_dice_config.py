@@ -114,6 +114,14 @@ def test_carddeck_draw_peek_cycle_and_empty(monkeypatch):
     assert deck.index == 0
 
 
+def test_carddeck_empty_helpers_return_safe_values():
+    # Covers empty-deck helpers that should not raise (remaining cards and repr text).
+    empty = CardDeck([])
+
+    assert empty.cards_remaining() == 0
+    assert repr(empty) == "CardDeck(0 cards, next=0)"
+
+
 def test_dice_roll_updates_streak_and_description(monkeypatch):
     # Covers roll() doubles and non-doubles branches plus describe().
     dice = Dice()
