@@ -3,7 +3,7 @@
 - Base URL: `http://localhost:8000/api/v1`
 - Tooling: `pytest`, `requests`
 - Test command: `rollnumber/whitebox/.venv/bin/python -m pytest -q rollnumber/blackbox/tests`
-- Latest run summary: `63 passed, 18 failed`
+- Latest run summary: `63 passed, 37 failed`
 
 ## Test Cases
 
@@ -475,6 +475,12 @@
 - Expected output: `404 Not Found`
 - Why this test is needed: Update should target an existing cart item; missing items must not succeed silently.
 
+### Test Case: test_non_existing_user_id_is_rejected_for_user_scoped_write_endpoints
+- Endpoint tested: `POST /api/v1/cart/add`, `POST /api/v1/cart/update`, `POST /api/v1/cart/remove`, `DELETE /api/v1/cart/clear`, `POST /api/v1/checkout`, `POST /api/v1/wallet/add`, `POST /api/v1/support/ticket`, `POST /api/v1/addresses`, `POST /api/v1/products/{product_id}/reviews`
+- Input (method, URL, body): Valid payload for each endpoint, but headers use non-existing `X-User-ID: 999999`
+- Expected output: `400 Bad Request` for all user-scoped write endpoints
+- Why this test is needed: Ensures write operations cannot execute unless the user context is valid and maps to a real user.
+
 ## Bug Group 1
 
 ### Bug 1
@@ -613,9 +619,67 @@
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with empty ticket list (`[]`)
 
+## Bug Group 7
+
+### Bug 22
+- Endpoint tested: `POST /api/v1/cart/add`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"product_id":1,"quantity":1}`
+- Expected result: `400 Bad Request` because non-existing users must be rejected
+- Actual result: `200 OK` with `{"message":"Item added to cart"}`
+
+### Bug 23
+- Endpoint tested: `POST /api/v1/cart/update`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"product_id":1,"quantity":2}`
+- Expected result: `400 Bad Request`
+- Actual result: `200 OK` with `{"message":"Cart updated successfully"}`
+
+### Bug 24
+- Endpoint tested: `POST /api/v1/cart/remove`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"product_id":1}`
+- Expected result: `400 Bad Request`
+- Actual result: `200 OK` with `{"message":"Item removed from cart"}`
+
+### Bug 25
+- Endpoint tested: `DELETE /api/v1/cart/clear`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
+- Expected result: `400 Bad Request`
+- Actual result: `200 OK` with `{"message":"Cart cleared successfully"}`
+
+### Bug 26
+- Endpoint tested: `POST /api/v1/checkout`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"payment_method":"CARD"}`
+- Expected result: `400 Bad Request`
+- Actual result: `200 OK` and order created (`{"payment_status":"PAID","order_status":"PLACED","total_amount":0}`)
+
+## Bug Group 8
+
+### Bug 27
+- Endpoint tested: `POST /api/v1/wallet/add`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"amount":1}`
+- Expected result: `400 Bad Request`
+- Actual result: `200 OK` with `{"message":"Wallet topped up successfully","wallet_balance":0}`
+
+### Bug 28
+- Endpoint tested: `POST /api/v1/support/ticket`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"subject":"Need Help","message":"non-existing user must be rejected"}`
+- Expected result: `400 Bad Request`
+- Actual result: `200 OK` and ticket created (`{"status":"OPEN","ticket_id":...}`)
+
+### Bug 29
+- Endpoint tested: `POST /api/v1/addresses`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"label":"HOME","street":"12345 Ghost Street","city":"Pune","pincode":"411001","is_default":false}`
+- Expected result: `400 Bad Request`
+- Actual result: `200 OK` and address created (`{"address":{"address_id":...}}`)
+
+### Bug 30
+- Endpoint tested: `POST /api/v1/products/{product_id}/reviews`
+- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"rating":5,"comment":"review should fail for invalid user"}`
+- Expected result: `400 Bad Request`
+- Actual result: `200 OK` with review creation response (`{"message":"Review added successfully","review_id":...}`)
+
 ## Execution Notes
 
 - Full test suite run command: `rollnumber/whitebox/.venv/bin/python -m pytest -q rollnumber/blackbox/tests`
-- Observed result (latest run): `63 passed, 18 failed`
-- Bugs are now grouped up to Bug 21.
-- Round-4 tests were added after this run; while validating further, the local API became unreachable on `localhost:8000` (connection refused), so full-suite re-run for round-4 was blocked.
+- Observed result (latest run): `63 passed, 37 failed`
+- Bugs are now grouped up to Bug 30.
+- Round-5 testing added non-existing-user validation checks for user-scoped write endpoints and identified additional acceptance of invalid user context.
