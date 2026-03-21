@@ -492,7 +492,7 @@ coverage report -m
 ```
 
 Latest outcome:
-- Total tests: **56 passed**
+- Total tests: **58 passed**
 - Source-code branch coverage: **100%** for all modules in `code/moneypoly/`
 
 ### Newly Added Test Cases
@@ -512,10 +512,20 @@ Latest outcome:
 - Branch/path covered: equality boundary in `_handle_collect_from_all_card` (`balance >= value`).
 - Why needed: exact-boundary values are common failure points in money logic.
 
+### `test_bank_collect_ignores_negative_amounts`
+- What it tests: verifies that invalid negative amounts do not get treated as incoming bank collections.
+- Branch/path covered: negative-input guard path in `Bank.collect`.
+- Why needed: protects financial accounting from incorrect reserve reductions via a collect operation.
+
 ### `test_carddeck_empty_helpers_return_safe_values`
 - What it tests: empty deck helper methods for remaining count and debug representation.
 - Branch/path covered: empty-list defensive paths in `CardDeck.cards_remaining` and `CardDeck.__repr__`.
 - Why needed: empty collections are common edge cases; helper methods should not crash.
+
+### `test_player_net_worth_includes_owned_property_values`
+- What it tests: verifies that player net worth counts both cash and owned property value.
+- Branch/path covered: `Player.net_worth` aggregation path with owned assets.
+- Why needed: winner/ranking decisions should reflect total wealth, not cash alone.
 
 ### `test_play_turn_bankruptcy_does_not_skip_next_player`
 - What it tests: when the active player goes bankrupt mid-turn, the next valid player should play next.
@@ -537,7 +547,17 @@ Latest outcome:
 - How discovered: `test_play_turn_bankruptcy_does_not_skip_next_player` failed (turn moved to `C` instead of `B`).
 - What was changed: added a post-resolution check in `Game.play_turn` to end the turn correctly when the active player has been removed.
 
+### Error 16
+- What was wrong: `Bank.collect` accepted negative values, which incorrectly reduced reserves through an API intended for incoming money.
+- How discovered: `test_bank_collect_ignores_negative_amounts` failed.
+- What was changed: added a negative-input guard in `Bank.collect` and updated mortgage payout flow to use `Bank.pay_out` instead of negative collection.
+
+### Error 17
+- What was wrong: player net worth only returned cash balance and ignored owned properties.
+- How discovered: `test_player_net_worth_includes_owned_property_values` failed.
+- What was changed: updated `Player.net_worth` to include total value of owned properties.
+
 ### Updated Summary (Including Latest Round)
-- Total white-box tests now: **56**
-- Total logical errors fixed by tests: **15**
+- Total white-box tests now: **58**
+- Total logical errors fixed by tests: **17**
 - Final source branch coverage (Coverage.py): **100%**
