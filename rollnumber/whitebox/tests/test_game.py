@@ -291,6 +291,22 @@ def test_mortgage_property_branches():
     assert owner.balance == start + prop.mortgage_value
 
 
+def test_mortgage_property_handles_insufficient_bank_reserves():
+    # Covers mortgage edge case where bank cannot pay payout amount.
+    game = Game(["A", "B"])
+    owner = game.players[0]
+    prop = _sample_property()
+    prop.owner = owner
+    owner.add_property(prop)
+    owner_start = owner.balance
+
+    game.bank._funds = prop.mortgage_value - 1
+
+    assert game.mortgage_property(owner, prop) is False
+    assert owner.balance == owner_start
+    assert prop.is_mortgaged is False
+
+
 def test_unmortgage_property_branches():
     # Covers unmortgage_property not-owner, not-mortgaged, cannot-afford, and success paths.
     game = Game(["A", "B"])

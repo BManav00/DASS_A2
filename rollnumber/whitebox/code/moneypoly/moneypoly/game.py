@@ -177,10 +177,14 @@ class Game:
         if prop.owner != player:
             print(f"  {player.name} does not own {prop.name}.")
             return False
-        payout = prop.mortgage()
-        if payout == 0:
+        if prop.is_mortgaged:
             print(f"  {prop.name} is already mortgaged.")
             return False
+        payout = prop.mortgage_value
+        if self.bank.get_balance() < payout:
+            print(f"  Bank cannot fund a mortgage payout for {prop.name} right now.")
+            return False
+        prop.mortgage()
         player.add_money(self.bank.pay_out(payout))
         print(f"  {player.name} mortgaged {prop.name} and received ${payout}.")
         return True
