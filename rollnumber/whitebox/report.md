@@ -492,7 +492,7 @@ coverage report -m
 ```
 
 Latest outcome:
-- Total tests: **58 passed**
+- Total tests: **60 passed**
 - Source-code branch coverage: **100%** for all modules in `code/moneypoly/`
 
 ### Newly Added Test Cases
@@ -532,6 +532,16 @@ Latest outcome:
 - Branch/path covered: `Game.play_turn` post-resolution flow when current player is removed from `self.players`.
 - Why needed: this guards turn-order correctness after eliminations.
 
+### `test_mortgage_property_handles_insufficient_bank_reserves`
+- What it tests: verifies that mortgaging fails safely when bank reserves cannot cover payout.
+- Branch/path covered: insufficient-bank-reserve path in `Game.mortgage_property`.
+- Why needed: prevents runtime crashes and invalid mortgage state in low-funds scenarios.
+
+### `test_trade_rejects_self_trade_action`
+- What it tests: ensures a player cannot trade a property with themselves.
+- Branch/path covered: seller-equals-buyer guard path in `Game.trade`.
+- Why needed: this is an unexpected player action that should be rejected explicitly.
+
 ### Error 13
 - What was wrong: emergency loans were added to player balance, but bank reserves were not reduced.
 - How discovered: `test_bank_give_loan_reduces_reserves` failed.
@@ -557,7 +567,17 @@ Latest outcome:
 - How discovered: `test_player_net_worth_includes_owned_property_values` failed.
 - What was changed: updated `Player.net_worth` to include total value of owned properties.
 
+### Error 18
+- What was wrong: mortgaging a property could crash if the bank had insufficient reserves for payout.
+- How discovered: `test_mortgage_property_handles_insufficient_bank_reserves` failed with `ValueError`.
+- What was changed: added reserve validation in `Game.mortgage_property` so the action fails cleanly without mutating mortgage state.
+
+### Error 19
+- What was wrong: the trade flow allowed self-trades (same seller and buyer), which is an invalid action.
+- How discovered: `test_trade_rejects_self_trade_action` failed.
+- What was changed: added a guard in `Game.trade` to reject self-trades before any transfer logic.
+
 ### Updated Summary (Including Latest Round)
-- Total white-box tests now: **58**
-- Total logical errors fixed by tests: **17**
+- Total white-box tests now: **60**
+- Total logical errors fixed by tests: **19**
 - Final source branch coverage (Coverage.py): **100%**
