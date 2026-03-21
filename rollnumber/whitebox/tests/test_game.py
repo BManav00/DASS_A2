@@ -97,6 +97,24 @@ def test_play_turn_non_doubles_advances_turn(monkeypatch):
     assert called == {"advance": 1, "move": 1}
 
 
+def test_play_turn_bankruptcy_does_not_skip_next_player(monkeypatch):
+    # Covers elimination edge case: active bankrupt player removal must not skip next turn.
+    game = Game(["A", "B", "C"])
+    game.dice = _DiceStub(roll_value=4, doubles=False, streak=0)
+
+    def bankrupt_current(player, _steps):
+        player.balance = 0
+        game._check_bankruptcy(player)
+
+    monkeypatch.setattr(game, "_move_and_resolve", bankrupt_current)
+
+    game.play_turn()
+
+    assert [p.name for p in game.players] == ["B", "C"]
+    assert game.current_player().name == "B"
+    assert game.turn_number == 1
+
+
 def test_move_and_resolve_tile_branches(monkeypatch):
     # Covers _move_and_resolve branches for every tile category and property lookup path.
     game = Game(["A", "B"])
