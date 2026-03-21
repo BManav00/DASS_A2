@@ -492,7 +492,7 @@ coverage report -m
 ```
 
 Latest outcome:
-- Total tests: **54 passed**
+- Total tests: **56 passed**
 - Source-code branch coverage: **100%** for all modules in `code/moneypoly/`
 
 ### Newly Added Test Cases
@@ -512,12 +512,32 @@ Latest outcome:
 - Branch/path covered: equality boundary in `_handle_collect_from_all_card` (`balance >= value`).
 - Why needed: exact-boundary values are common failure points in money logic.
 
+### `test_carddeck_empty_helpers_return_safe_values`
+- What it tests: empty deck helper methods for remaining count and debug representation.
+- Branch/path covered: empty-list defensive paths in `CardDeck.cards_remaining` and `CardDeck.__repr__`.
+- Why needed: empty collections are common edge cases; helper methods should not crash.
+
+### `test_play_turn_bankruptcy_does_not_skip_next_player`
+- What it tests: when the active player goes bankrupt mid-turn, the next valid player should play next.
+- Branch/path covered: `Game.play_turn` post-resolution flow when current player is removed from `self.players`.
+- Why needed: this guards turn-order correctness after eliminations.
+
 ### Error 13
 - What was wrong: emergency loans were added to player balance, but bank reserves were not reduced.
 - How discovered: `test_bank_give_loan_reduces_reserves` failed.
 - What was changed: updated `Bank.give_loan` to subtract the loan amount from bank funds before crediting the player.
 
+### Error 14
+- What was wrong: empty card decks crashed when asking for remaining cards or string representation.
+- How discovered: `test_carddeck_empty_helpers_return_safe_values` failed with `ZeroDivisionError`.
+- What was changed: added empty-deck guards in `CardDeck.cards_remaining` and `CardDeck.__repr__`.
+
+### Error 15
+- What was wrong: after a current player was eliminated for bankruptcy, turn advancement could skip the next player.
+- How discovered: `test_play_turn_bankruptcy_does_not_skip_next_player` failed (turn moved to `C` instead of `B`).
+- What was changed: added a post-resolution check in `Game.play_turn` to end the turn correctly when the active player has been removed.
+
 ### Updated Summary (Including Latest Round)
-- Total white-box tests now: **54**
-- Total logical errors fixed by tests: **13**
+- Total white-box tests now: **56**
+- Total logical errors fixed by tests: **15**
 - Final source branch coverage (Coverage.py): **100%**
