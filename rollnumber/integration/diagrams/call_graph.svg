@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <style>
+    .box { fill: #f3f7ff; stroke: #1f4ea3; stroke-width: 2; rx: 10; ry: 10; }
+    .label { font-family: Arial, sans-serif; font-size: 16px; fill: #0f1f3d; }
+    .title { font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; fill: #0b2e63; }
+    .edge { stroke: #274f8a; stroke-width: 2.2; marker-end: url(#arrow); }
+  </style>
+
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#274f8a" />
+    </marker>
+  </defs>
+
+  <text x="30" y="40" class="title">StreetRace Manager - Integration Call Graph</text>
+
+  <rect class="box" x="60" y="90" width="250" height="90" />
+  <text class="label" x="80" y="125">CLI / User Actions</text>
+  <text class="label" x="80" y="150">run_cli()</text>
+
+  <rect class="box" x="380" y="70" width="340" height="140" />
+  <text class="label" x="400" y="105">StreetRaceManager</text>
+  <text class="label" x="400" y="130">register_crew_member()</text>
+  <text class="label" x="400" y="155">create_race(), record_race_result()</text>
+  <text class="label" x="400" y="180">assign_mission(), repair_car()</text>
+
+  <rect class="box" x="800" y="60" width="320" height="100" />
+  <text class="label" x="820" y="95">RegistrationModule</text>
+  <text class="label" x="820" y="120">register_member(), get_member()</text>
+
+  <rect class="box" x="800" y="190" width="320" height="120" />
+  <text class="label" x="820" y="225">CrewManagementModule</text>
+  <text class="label" x="820" y="250">assign_role(), set_skill_level()</text>
+  <text class="label" x="820" y="275">has_role(), available_by_role()</text>
+
+  <rect class="box" x="800" y="340" width="320" height="130" />
+  <text class="label" x="820" y="375">InventoryModule</text>
+  <text class="label" x="820" y="400">add_car(), set_car_damage()</text>
+  <text class="label" x="820" y="425">consume_spare_part(), update_cash()</text>
+
+  <rect class="box" x="420" y="260" width="300" height="105" />
+  <text class="label" x="440" y="295">VehicleMaintenanceModule</text>
+  <text class="label" x="440" y="320">validate_car_ready_for_race()</text>
+  <text class="label" x="440" y="345">repair_car()</text>
+
+  <rect class="box" x="420" y="395" width="300" height="110" />
+  <text class="label" x="440" y="430">RaceManagementModule</text>
+  <text class="label" x="440" y="455">select_driver_and_car()</text>
+  <text class="label" x="440" y="480">create_race(), mark_race_completed()</text>
+
+  <rect class="box" x="420" y="535" width="300" height="110" />
+  <text class="label" x="440" y="570">ResultsModule</text>
+  <text class="label" x="440" y="595">record_race_result()</text>
+  <text class="label" x="440" y="620">updates ranking + cash</text>
+
+  <rect class="box" x="60" y="260" width="300" height="110" />
+  <text class="label" x="80" y="295">MissionPlanningModule</text>
+  <text class="label" x="80" y="320">validate_required_roles()</text>
+  <text class="label" x="80" y="345">assign_mission()</text>
+
+  <rect class="box" x="60" y="430" width="300" height="110" />
+  <text class="label" x="80" y="465">EventSchedulerModule</text>
+  <text class="label" x="80" y="490">schedule_event()</text>
+  <text class="label" x="80" y="515">mark_event_completed()</text>
+
+  <line class="edge" x1="310" y1="135" x2="380" y2="135" />
+
+  <line class="edge" x1="720" y1="115" x2="800" y2="105" />
+  <line class="edge" x1="720" y1="145" x2="800" y2="240" />
+  <line class="edge" x1="720" y1="165" x2="800" y2="390" />
+
+  <line class="edge" x1="560" y1="210" x2="560" y2="260" />
+  <line class="edge" x1="560" y1="365" x2="560" y2="395" />
+  <line class="edge" x1="560" y1="505" x2="560" y2="535" />
+
+  <line class="edge" x1="720" y1="430" x2="800" y2="410" />
+  <line class="edge" x1="720" y1="575" x2="800" y2="430" />
+
+  <line class="edge" x1="380" y1="155" x2="360" y2="300" />
+  <line class="edge" x1="380" y1="180" x2="360" y2="470" />
+
+  <line class="edge" x1="360" y1="315" x2="420" y2="315" />
+  <line class="edge" x1="360" y1="485" x2="420" y2="585" />
+
+  <line class="edge" x1="360" y1="505" x2="420" y2="450" />
+  <line class="edge" x1="360" y1="470" x2="420" y2="300" />
+</svg>
