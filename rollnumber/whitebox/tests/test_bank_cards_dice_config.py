@@ -61,6 +61,18 @@ def test_bank_give_loan_and_loan_stats(capsys):
     assert "Loans issued" in out
 
 
+def test_bank_give_loan_reduces_reserves():
+    # Ensures emergency loans decrease bank reserves as stated by method behavior/docs.
+    bank = Bank()
+    player = Player("Borrower", balance=0)
+    start_reserves = bank.get_balance()
+
+    bank.give_loan(player, 120)
+
+    assert player.balance == 120
+    assert bank.get_balance() == start_reserves - 120
+
+
 def test_bank_handles_large_transactions():
     # Covers large-value branch behavior for collection and payout math.
     bank = Bank()
