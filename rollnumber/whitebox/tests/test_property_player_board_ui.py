@@ -97,6 +97,21 @@ def test_player_money_and_bankruptcy_branches():
     assert player.is_bankrupt() is True
 
 
+def test_player_net_worth_includes_owned_property_values():
+    # Covers net-worth path including property value contribution.
+    player = Player("Investor", balance=100)
+    group = PropertyGroup("Blue", "blue")
+    prop_a = Property("A", 1, (120, 10), group)
+    prop_b = Property("B", 3, (80, 8), group)
+
+    prop_a.owner = player
+    prop_b.owner = player
+    player.add_property(prop_a)
+    player.add_property(prop_b)
+
+    assert player.net_worth() == 300
+
+
 def test_player_move_go_jail_and_property_management(capsys):
     # Covers move paths (land/pass go), jail transition, and property list branches.
     player = Player("Mover", balance=100)
