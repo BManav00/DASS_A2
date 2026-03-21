@@ -151,6 +151,17 @@ def test_player_move_large_steps_and_zero_steps():
     assert player.balance == before
 
 
+def test_player_move_negative_steps_does_not_collect_go_salary():
+    # Covers unexpected negative movement input without awarding Go salary.
+    player = Player("Reverse", balance=300)
+    player.position = 2
+
+    player.move(-3)
+
+    assert player.position == 39
+    assert player.balance == 300
+
+
 def test_player_status_line_jail_and_non_jail():
     # Covers status_line conditional tag branch.
     player = Player("Status", balance=500)

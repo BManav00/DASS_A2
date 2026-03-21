@@ -478,6 +478,19 @@ def test_collect_from_all_action_branches():
     assert player.balance == start_player + 10
 
 
+def test_collect_from_all_allows_exact_balance_payment():
+    # Covers exact-balance transfer edge case for collect-from-all card effects.
+    game = Game(["A", "B"])
+    collector = game.players[0]
+    payer = game.players[1]
+    payer.balance = 15
+
+    game._handle_collect_from_all_card(collector, 15)
+
+    assert payer.balance == 0
+    assert collector.balance == 1515
+
+
 def test_check_bankruptcy_branches():
     # Covers _check_bankruptcy for healthy player, removal path, and non-membership path.
     game = Game(["A", "B"])

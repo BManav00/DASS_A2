@@ -29,4 +29,13 @@ cd whitebox
 .venv/bin/pytest tests --cov=moneypoly --cov=main --cov-branch --cov-report=term-missing
 ```
 
+## How To Run Coverage.py (Branch Coverage)
+
+```bash
+cd whitebox
+.venv/bin/coverage erase
+.venv/bin/coverage run --branch -m pytest tests
+.venv/bin/coverage report -m
+```
+
 The tests are structured for white-box branch coverage and include edge cases and state-based checks.

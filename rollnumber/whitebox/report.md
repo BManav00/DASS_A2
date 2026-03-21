@@ -478,3 +478,46 @@ Coverage summary from final run:
 - Total white-box tests implemented: **51**
 - Logical errors fixed: **12**
 - Final status: all tests pass and strict **100% branch coverage achieved**.
+
+---
+
+## Additional Coverage.py Validation Round (Latest)
+
+Coverage.py command used:
+
+```bash
+coverage erase
+coverage run --branch -m pytest tests
+coverage report -m
+```
+
+Latest outcome:
+- Total tests: **54 passed**
+- Source-code branch coverage: **100%** for all modules in `code/moneypoly/`
+
+### Newly Added Test Cases
+
+### `test_bank_give_loan_reduces_reserves`
+- What it tests: checks that the bank's cash reserves go down after giving a loan.
+- Branch/path covered: positive-loan path in `Bank.give_loan` with state update validation.
+- Why needed: a loan should reduce bank money; otherwise bank balance becomes unrealistic.
+
+### `test_player_move_negative_steps_does_not_collect_go_salary`
+- What it tests: moving backwards (negative steps) does not wrongly award Go salary.
+- Branch/path covered: unexpected-input path in `Player.move` when `steps <= 0`.
+- Why needed: protects against incorrect money gains for invalid or reverse moves.
+
+### `test_collect_from_all_allows_exact_balance_payment`
+- What it tests: another player pays when their balance is exactly equal to required amount.
+- Branch/path covered: equality boundary in `_handle_collect_from_all_card` (`balance >= value`).
+- Why needed: exact-boundary values are common failure points in money logic.
+
+### Error 13
+- What was wrong: emergency loans were added to player balance, but bank reserves were not reduced.
+- How discovered: `test_bank_give_loan_reduces_reserves` failed.
+- What was changed: updated `Bank.give_loan` to subtract the loan amount from bank funds before crediting the player.
+
+### Updated Summary (Including Latest Round)
+- Total white-box tests now: **54**
+- Total logical errors fixed by tests: **13**
+- Final source branch coverage (Coverage.py): **100%**
