@@ -23,6 +23,16 @@ def test_bank_collect_and_get_balance():
     assert "Bank(" in repr(bank)
 
 
+def test_bank_collect_ignores_negative_amounts():
+    # Covers invalid-negative collection path to protect bank accounting integrity.
+    bank = Bank()
+    start = bank.get_balance()
+
+    bank.collect(-100)
+
+    assert bank.get_balance() == start
+
+
 def test_bank_pay_out_non_positive_and_valid_and_insufficient():
     # Covers pay_out branches: non-positive, normal payout, and insufficient funds.
     bank = Bank()
