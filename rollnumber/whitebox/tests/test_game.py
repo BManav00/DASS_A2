@@ -364,6 +364,20 @@ def test_trade_rejects_non_positive_cash_amount():
     assert game.trade(seller, buyer, prop, -10) is False
 
 
+def test_trade_rejects_self_trade_action():
+    # Covers unexpected action path where seller and buyer are the same player.
+    game = Game(["A", "B"])
+    seller = game.players[0]
+    prop = _sample_property()
+    prop.owner = seller
+    seller.add_property(prop)
+    seller_start = seller.balance
+
+    assert game.trade(seller, seller, prop, 50) is False
+    assert prop.owner == seller
+    assert seller.balance == seller_start
+
+
 def test_auction_property_with_winner(monkeypatch):
     # Covers auction bid branches (pass/low/too-high/valid) and winner assignment path.
     game = Game(["A", "B", "C", "D"])
