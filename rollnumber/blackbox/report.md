@@ -591,25 +591,25 @@
 
 ### Bug 17
 - Endpoint tested: `GET /api/v1/cart`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999` (non-existent user)
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999` (non-existent user)
 - Expected result: `400 Bad Request` because user must exist
 - Actual result: `200 OK` with cart payload (example: `{"cart_id":202,"items":[],"total":0}`)
 
 ### Bug 18
 - Endpoint tested: `GET /api/v1/wallet`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with wallet payload (`{"wallet_balance":0}`)
 
 ### Bug 19
 - Endpoint tested: `GET /api/v1/orders`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with empty orders list (`[]`)
 
 ### Bug 20
 - Endpoint tested: `GET /api/v1/support/tickets`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with empty ticket list (`[]`)
 
@@ -617,25 +617,25 @@
 
 ### Bug 21
 - Endpoint tested: `POST /api/v1/cart/add`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"product_id":1,"quantity":1}`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999`, body `{"product_id":1,"quantity":1}`
 - Expected result: `400 Bad Request` because non-existing users must be rejected
 - Actual result: `200 OK` with `{"message":"Item added to cart"}`
 
 ### Bug 22
 - Endpoint tested: `POST /api/v1/cart/update`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"product_id":1,"quantity":2}`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999`, body `{"product_id":1,"quantity":2}`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with `{"message":"Cart updated successfully"}`
 
 ### Bug 23
 - Endpoint tested: `POST /api/v1/cart/remove`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"product_id":1}`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999`, body `{"product_id":1}`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with `{"message":"Item removed from cart"}`
 
 ### Bug 24
 - Endpoint tested: `DELETE /api/v1/cart/clear`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with `{"message":"Cart cleared successfully"}`
 
@@ -643,31 +643,32 @@
 
 ### Bug 25
 - Endpoint tested: `POST /api/v1/wallet/add`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"amount":1}`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999`, body `{"amount":1}`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with `{"message":"Wallet topped up successfully","wallet_balance":0}`
 
 ### Bug 26
 - Endpoint tested: `POST /api/v1/support/ticket`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"subject":"Need Help","message":"non-existing user must be rejected"}`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999`, body `{"subject":"Need Help","message":"non-existing user must be rejected"}`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` and ticket created (`{"status":"OPEN","ticket_id":...}`)
 
 ### Bug 27
 - Endpoint tested: `POST /api/v1/addresses`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"label":"HOME","street":"12345 Ghost Street","city":"Pune","pincode":"411001","is_default":false}`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999`, body `{"label":"HOME","street":"12345 Ghost Street","city":"Pune","pincode":"411001","is_default":false}`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` and address created (`{"address":{"address_id":...}}`)
 
 ### Bug 28
 - Endpoint tested: `POST /api/v1/products/{product_id}/reviews`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"rating":5,"comment":"review should fail for invalid user"}`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 999999`, body `{"rating":5,"comment":"review should fail for invalid user"}`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with review creation response (`{"message":"Review added successfully","review_id":...}`)
 
 ## Revalidation With Roll Number 2024101105
 
 - Revalidated by switching headers to `X-Roll-Number: 2024101105` (default updated in pytest config).
+- Rechecked Bugs 17-28 with `X-User-ID: 999999`; all remain reproducible with this roll number (`200` responses instead of expected `400`).
 - Removed two previously listed checkout issues after revalidation with this roll number:
   - Empty-cart checkout acceptance (old Bug 4) is not reproducible.
   - Non-existing-user checkout acceptance (old Bug 26) is not reproducible.
