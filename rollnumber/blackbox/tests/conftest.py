@@ -13,7 +13,7 @@ def base_url() -> str:
 
 @pytest.fixture(scope="session")
 def roll_number() -> str:
-    return os.getenv("QUICKCART_ROLL_NUMBER", "1")
+    return os.getenv("QUICKCART_ROLL_NUMBER", "2024101105")
 
 
 @pytest.fixture(scope="session")

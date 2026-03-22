@@ -677,9 +677,25 @@
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with review creation response (`{"message":"Review added successfully","review_id":...}`)
 
+## Revalidation With Roll Number 2024101105
+
+- Revalidated by switching headers to `X-Roll-Number: 2024101105` (default updated in pytest config).
+- Previously reported checkout behavior changed for this roll number:
+  - Earlier Bug 4 (`POST /checkout` with empty cart) is now **not reproducible** (`400`, `{"error":"Cart is empty"}`).
+  - Earlier Bug 26 (`POST /checkout` with non-existing `X-User-ID`) is now **not reproducible** (`400` instead of `200`).
+
+## Bug Group 9
+
+### Bug 31
+- Endpoint tested: `POST /api/v1/checkout`
+- Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 1`; cart with `{"product_id":1,"quantity":50}` followed by body `{"payment_method":"COD"}`
+- Expected result: `400 Bad Request` because COD must be rejected when order total exceeds `5000`
+- Actual result: `200 OK` with placed order (example: `{"total_amount":6300,"payment_status":"PENDING","order_status":"PLACED"}`)
+
 ## Execution Notes
 
 - Full test suite run command: `rollnumber/whitebox/.venv/bin/python -m pytest -q rollnumber/blackbox/tests`
-- Observed result (latest run): `63 passed, 37 failed`
-- Bugs are now grouped up to Bug 30.
+- Observed result (latest run with default `X-Roll-Number: 2024101105`): `63 passed, 37 failed`
+- Bugs are now grouped up to Bug 31.
 - Round-5 testing added non-existing-user validation checks for user-scoped write endpoints and identified additional acceptance of invalid user context.
+- Because the API mutates shared state (stock, orders, wallet), some assertion counts can vary slightly across repeated full-suite runs.
