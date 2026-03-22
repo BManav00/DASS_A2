@@ -504,18 +504,12 @@
 ## Bug Group 2
 
 ### Bug 4
-- Endpoint tested: `POST /api/v1/checkout`
-- Request payload: Empty cart + `{"payment_method":"COD"}`
-- Expected result: `400 Bad Request` because checkout must reject empty carts
-- Actual result: `200 OK` and order created with `total_amount=0`
-
-### Bug 5
 - Endpoint tested: `POST /api/v1/products/{product_id}/reviews`
 - Request payload: `{"rating":0,"comment":"below range"}` and `{"rating":6,"comment":"above range"}`
 - Expected result: `400 Bad Request` for ratings outside 1..5
 - Actual result: `200 OK` and review records created
 
-### Bug 6
+### Bug 5
 - Endpoint tested: `PUT /api/v1/addresses/{address_id}`
 - Request payload: `{"street":"99999 Updated Street ...","is_default":true}`
 - Expected result: Updated address data should be returned and persisted
@@ -523,19 +517,19 @@
 
 ## Bug Group 3
 
-### Bug 7
+### Bug 6
 - Endpoint tested: `GET /api/v1/cart`
 - Request payload: Cart with multiple items (for example `product_id=1, quantity=2` and `product_id=2, quantity=1`)
 - Expected result: `cart.total` equals sum of all item subtotals
 - Actual result: `cart.total` omits the last item subtotal (example observed: expected `-142`, actual `-16`)
 
-### Bug 8
+### Bug 7
 - Endpoint tested: `POST /api/v1/products/{product_id}/reviews`
 - Request payload: Review submitted to non-existent product ID (random high ID)
 - Expected result: `404 Not Found` (product should exist before review creation)
 - Actual result: `200 OK` and review row is created
 
-### Bug 9
+### Bug 8
 - Endpoint tested: `GET /api/v1/support/tickets`
 - Request payload: Create ticket with message, then list tickets as same user
 - Expected result: Ticket object includes the stored `message` for user visibility
@@ -543,25 +537,25 @@
 
 ## Bug Group 4
 
-### Bug 10
+### Bug 9
 - Endpoint tested: `GET /api/v1/profile` (header validation path)
 - Request payload: Header `X-User-ID: 999999` with valid `X-Roll-Number`
 - Expected result: `400 Bad Request` per documented header validation contract
 - Actual result: `404 Not Found`
 
-### Bug 11
+### Bug 10
 - Endpoint tested: `GET /api/v1/products` vs `GET /api/v1/admin/products`
 - Request payload: Compare same `product_id` values across user/admin product listings
 - Expected result: User-facing `price` must exactly match database/admin `price`
 - Actual result: Price mismatch observed (example: user `100` vs admin `95` for same product)
 
-### Bug 12
+### Bug 11
 - Endpoint tested: `POST /api/v1/wallet/pay`
 - Request payload: Add `10`, then pay `5`, then compare wallet before/after
 - Expected result: Exactly `5` should be deducted
 - Actual result: Deduction differs (observed around `5.6`)
 
-### Bug 13
+### Bug 12
 - Endpoint tested: `POST /api/v1/orders/{order_id}/cancel`, `GET /api/v1/products/{product_id}`
 - Request payload: Create fresh order with quantity `1`, cancel it, check product stock
 - Expected result: Stock increases by exactly `1` after cancellation
@@ -569,19 +563,19 @@
 
 ## Bug Group 5
 
-### Bug 14
+### Bug 13
 - Endpoint tested: `POST /api/v1/cart/add`
 - Request payload: `{"product_id":1}` (missing `quantity`)
 - Expected result: `400 Bad Request` because `quantity` is required and must be at least 1
 - Actual result: `200 OK` with item-added response
 
-### Bug 15
+### Bug 14
 - Endpoint tested: `POST /api/v1/cart/update`
 - Request payload: `{"quantity":2}` (missing `product_id`)
 - Expected result: `400 Bad Request` because update target item is unspecified
 - Actual result: `200 OK` with `Cart updated successfully`
 
-### Bug 16
+### Bug 15
 - Endpoint tested: `GET /api/v1/products/{product_id}/reviews`
 - Request payload: `GET /products/987654321/reviews` (non-existent product)
 - Expected result: `404 Not Found`
@@ -589,31 +583,31 @@
 
 ## Bug Group 6
 
-### Bug 17
+### Bug 16
 - Endpoint tested: `POST /api/v1/cart/update`
 - Request payload: `{"product_id":1,"quantity":2}` with empty cart / product absent in cart
 - Expected result: `404 Not Found`
 - Actual result: `200 OK` with `Cart updated successfully`
 
-### Bug 18
+### Bug 17
 - Endpoint tested: `GET /api/v1/cart`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999` (non-existent user)
 - Expected result: `400 Bad Request` because user must exist
 - Actual result: `200 OK` with cart payload (example: `{"cart_id":202,"items":[],"total":0}`)
 
-### Bug 19
+### Bug 18
 - Endpoint tested: `GET /api/v1/wallet`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with wallet payload (`{"wallet_balance":0}`)
 
-### Bug 20
+### Bug 19
 - Endpoint tested: `GET /api/v1/orders`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with empty orders list (`[]`)
 
-### Bug 21
+### Bug 20
 - Endpoint tested: `GET /api/v1/support/tickets`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
 - Expected result: `400 Bad Request`
@@ -621,57 +615,51 @@
 
 ## Bug Group 7
 
-### Bug 22
+### Bug 21
 - Endpoint tested: `POST /api/v1/cart/add`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"product_id":1,"quantity":1}`
 - Expected result: `400 Bad Request` because non-existing users must be rejected
 - Actual result: `200 OK` with `{"message":"Item added to cart"}`
 
-### Bug 23
+### Bug 22
 - Endpoint tested: `POST /api/v1/cart/update`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"product_id":1,"quantity":2}`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with `{"message":"Cart updated successfully"}`
 
-### Bug 24
+### Bug 23
 - Endpoint tested: `POST /api/v1/cart/remove`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"product_id":1}`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with `{"message":"Item removed from cart"}`
 
-### Bug 25
+### Bug 24
 - Endpoint tested: `DELETE /api/v1/cart/clear`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with `{"message":"Cart cleared successfully"}`
 
-### Bug 26
-- Endpoint tested: `POST /api/v1/checkout`
-- Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"payment_method":"CARD"}`
-- Expected result: `400 Bad Request`
-- Actual result: `200 OK` and order created (`{"payment_status":"PAID","order_status":"PLACED","total_amount":0}`)
-
 ## Bug Group 8
 
-### Bug 27
+### Bug 25
 - Endpoint tested: `POST /api/v1/wallet/add`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"amount":1}`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` with `{"message":"Wallet topped up successfully","wallet_balance":0}`
 
-### Bug 28
+### Bug 26
 - Endpoint tested: `POST /api/v1/support/ticket`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"subject":"Need Help","message":"non-existing user must be rejected"}`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` and ticket created (`{"status":"OPEN","ticket_id":...}`)
 
-### Bug 29
+### Bug 27
 - Endpoint tested: `POST /api/v1/addresses`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"label":"HOME","street":"12345 Ghost Street","city":"Pune","pincode":"411001","is_default":false}`
 - Expected result: `400 Bad Request`
 - Actual result: `200 OK` and address created (`{"address":{"address_id":...}}`)
 
-### Bug 30
+### Bug 28
 - Endpoint tested: `POST /api/v1/products/{product_id}/reviews`
 - Request payload: Headers `X-Roll-Number: 1`, `X-User-ID: 999999`, body `{"rating":5,"comment":"review should fail for invalid user"}`
 - Expected result: `400 Bad Request`
@@ -680,13 +668,13 @@
 ## Revalidation With Roll Number 2024101105
 
 - Revalidated by switching headers to `X-Roll-Number: 2024101105` (default updated in pytest config).
-- Previously reported checkout behavior changed for this roll number:
-  - Earlier Bug 4 (`POST /checkout` with empty cart) is now **not reproducible** (`400`, `{"error":"Cart is empty"}`).
-  - Earlier Bug 26 (`POST /checkout` with non-existing `X-User-ID`) is now **not reproducible** (`400` instead of `200`).
+- Removed two previously listed checkout issues after revalidation with this roll number:
+  - Empty-cart checkout acceptance (old Bug 4) is not reproducible.
+  - Non-existing-user checkout acceptance (old Bug 26) is not reproducible.
 
 ## Bug Group 9
 
-### Bug 31
+### Bug 29
 - Endpoint tested: `POST /api/v1/checkout`
 - Request payload: Headers `X-Roll-Number: 2024101105`, `X-User-ID: 1`; cart with `{"product_id":1,"quantity":50}` followed by body `{"payment_method":"COD"}`
 - Expected result: `400 Bad Request` because COD must be rejected when order total exceeds `5000`
@@ -696,6 +684,6 @@
 
 - Full test suite run command: `rollnumber/whitebox/.venv/bin/python -m pytest -q rollnumber/blackbox/tests`
 - Observed result (latest run with default `X-Roll-Number: 2024101105`): `63 passed, 37 failed`
-- Bugs are now grouped up to Bug 31.
+- Bugs are now grouped up to Bug 29.
 - Round-5 testing added non-existing-user validation checks for user-scoped write endpoints and identified additional acceptance of invalid user context.
 - Because the API mutates shared state (stock, orders, wallet), some assertion counts can vary slightly across repeated full-suite runs.
