@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import runpy
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -305,6 +306,16 @@ def test_streetrace_manager_wrapper_methods_and_scheduling_branches() -> None:
     assert manager.get_cash_balance() == pytest.approx(300.0)
 
 
+def test_streetrace_manager_register_member_with_default_optional_values() -> None:
+    manager = StreetRaceManager()
+
+    member_name = manager.register_crew_member("Nia")
+
+    assert member_name == "Nia"
+    assert manager.registration.get_member("Nia").role is None
+    assert manager.crew.get_skill_level("Nia") == 0
+
+
 def test_split_csv_handles_whitespace_and_empty_values() -> None:
     assert cli_module._split_csv(" Ava, ,Noah,, Zoe ") == ["Ava", "Noah", "Zoe"]
 
@@ -403,6 +414,24 @@ def test_cli_returns_error_code_on_value_error(
 
     assert exit_code == 1
     assert captured == "Error: forced CLI failure"
+
+
+def test_cli_unknown_command_falls_through_to_success(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    class _UnknownCommandParser:
+        def parse_args(self, argv: list[str] | None = None) -> SimpleNamespace:
+            return SimpleNamespace(command="unknown")
+
+    monkeypatch.setattr(cli_module, "build_parser", lambda: _UnknownCommandParser())
+    monkeypatch.setattr(cli_module, "StreetRaceManager", _FakeCLIManager)
+
+    exit_code = cli_module.run_cli(["ignored"])
+    captured = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert captured == ""
 
 
 def test_cli_main_entrypoint_executes_with_system_exit(
