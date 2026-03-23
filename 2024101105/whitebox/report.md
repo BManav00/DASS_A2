@@ -581,3 +581,10 @@ Latest outcome:
 - Total white-box tests now: **60**
 - Total logical errors fixed by tests: **19**
 - Final source branch coverage (Coverage.py): **100%**
+
+## White-Box Diagram
+
+Diagram file:
+- `diagrams/Diagram4.jpeg`
+
+![White-Box Call Graph](diagrams/Diagram4.jpeg)

@@ -370,7 +370,9 @@ Actual outcome:
 
 ### 6.2 Call relationships (mapped to call graph)
 Diagram file:
-- `rollnumber/integration/diagrams/call_graph.svg`
+- `diagrams/Diagram3.jpeg`
+
+![Integration Call Graph](diagrams/Diagram3.jpeg)
 
 Key call chains:
 - `run_cli()` -> StreetRaceManager methods
